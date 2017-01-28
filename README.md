@@ -1,4 +1,4 @@
-# godfa
+# GO-DFA 
 Go Domain Flow Architecture emulation API server
 
 ## Domain Flow Architecture
