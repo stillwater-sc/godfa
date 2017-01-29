@@ -1,5 +1,5 @@
 /*
- File		:	$File: //depot/stillwater-sc/godfa/indexspace/constraintset_test.go $
+ File		:	$File: //depot/stillwater-sc/godfa/linalg/matrix_test.go $
 
  Authors	:	E. Theodore L. Omtzigt
  Date		:	28 January 2017
@@ -7,7 +7,7 @@
  Source Control Information:
  Version	:	$Revision: #1 $
  Latest		:	$Date: 2017/01/28 $
- Location	:	$Id: //depot/stillwater-sc/godfa/indexspace/constraintset_test.go#1 $
+ Location	:	$Id: //depot/stillwater-sc/godfa/linalg/matrix_test.go#1 $
 
  Organization:
 		Stillwater Supercomputing, Inc.

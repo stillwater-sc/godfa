@@ -22,7 +22,6 @@ Licence      : Stillwater license as defined in this directory
 package indexspace
 
 import (
-	linalg "github.com/stillwater-sc/godfa/la"
 	"log"
 )
 

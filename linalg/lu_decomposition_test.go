@@ -1,5 +1,5 @@
 /*
- File		:	$File: //depot/stillwater-sc/godfa/la/lu_decomposition_test.go $
+ File		:	$File: //depot/stillwater-sc/godfa/linalg/lu_decomposition_test.go $
 
  Authors	:	E. Theodore L. Omtzigt
  Date		:	29 January 2017
@@ -7,7 +7,7 @@
  Source Control Information:
  Version	:	$Revision: #1 $
  Latest		:	$Date: 2017/01/29 $
- Location	:	$Id: //depot/stillwater-sc/godfa/la/lu_decomposition_test.go#1 $
+ Location	:	$Id: //depot/stillwater-sc/godfa/linalg/lu_decomposition_test.go#1 $
 
  Organization:
 		Stillwater Supercomputing, Inc.
