@@ -58,7 +58,13 @@ func TestConstraintSet(t *testing.T) {
 func TestConstraintSet_SpecialConditions(t *testing.T) {
 	c1 := Constraint{1,0,0}
 	cs := NewConstraintSet()
+	if cs.Dimensionality() != 0 {
+		t.Error("Dimensionality of empty set is incorrect")
+	}
 	cs, _ = cs.AddConstraint(c1)
+	if cs.Dimensionality() != c1.Dimensionality() {
+		t.Error("Dimensionality of the Set is incorrect")
+	}
 	c2 := Constraint{1,0,0,0}
 	cs, err := cs.AddConstraint(c2)
 	if err == nil {

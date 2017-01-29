@@ -91,6 +91,24 @@ func (cSet ConstraintSet) GetConstraint(index int) (Constraint, error) {
 	return cSet[index], nil
 }
 
+// NrOfConstraints returns the number of Constraints in the Set
+func (cSet ConstraintSet) NrOfConstraints() int {
+	return len(cSet)
+}
+
+// Dimensionality returns the dimension of the Constraint
+func (c Constraint) Dimensionality() int {
+	return len(c)
+}
+
+// Dimensionality returns the dimension of the Constraints in the Set
+func (cSet ConstraintSet) Dimensionality() int {
+	if len(cSet) == 0 {
+		return 0
+	}
+	return cSet[0].Dimensionality()
+}
+
 // Stringer for a Constraint
 func (c Constraint) String() string {
 	var str string
@@ -100,7 +118,14 @@ func (c Constraint) String() string {
 	return str
 }
 
-// Always represent the ConstraintSet in its Transposed form
+/*
+String represents the ConstraintSet in its Transposed form
+
+The C^T matrix is represented by:
+ (i,j,k)[  1  0  0 -1  0  0 ]    [  N ]
+        [  0  1  0  0 -1  0 ] <= [  N ]
+        [  0  0  1  0  0 -1 ]    [  N ]
+  */
 func (cSet ConstraintSet) String() string {
 	if len(cSet) == 0 {
 		return "Empty Constraint Set"
