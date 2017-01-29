@@ -1,5 +1,5 @@
 /*
- File		:	$File: //depot/stillwater-sc/godfa/linalg/matrix_test.go $
+ File		:	$File: //depot/stillwater-sc/godfa/indexspace/matrix_test.go $
 
  Authors	:	E. Theodore L. Omtzigt
  Date		:	28 January 2017
@@ -7,7 +7,7 @@
  Source Control Information:
  Version	:	$Revision: #1 $
  Latest		:	$Date: 2017/01/28 $
- Location	:	$Id: //depot/stillwater-sc/godfa/linalg/matrix_test.go#1 $
+ Location	:	$Id: //depot/stillwater-sc/godfa/indexspace/matrix_test.go#1 $
 
  Organization:
 		Stillwater Supercomputing, Inc.
@@ -19,7 +19,7 @@ Copyright (c) 2006-2017 E. Theodore L. Omtzigt.  All rights reserved.
 Licence      : Stillwater license as defined in this directory
 
  */
-package la
+package indexspace
 
 import (
 	"testing"
@@ -107,7 +107,7 @@ func TestMatrix_String(t *testing.T) {
 	}
 }
 
-func ExampleConstraintSet() {
+func ExampleNewMatrixShell() {
 	c1 := NewVector(3)
 	c1[0] = 1
 	cs := NewMatrixShell()

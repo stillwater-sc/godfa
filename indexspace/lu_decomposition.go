@@ -1,5 +1,5 @@
 /*
- File		:	$File: //depot/stillwater-sc/godfa/linalg/lu_decomposition.go $
+ File		:	$File: //depot/stillwater-sc/godfa/indexspace/lu_decomposition.go $
 
  Authors	:	E. Theodore L. Omtzigt
  Date		:	29 January 2017
@@ -7,7 +7,7 @@
  Source Control Information:
  Version	:	$Revision: #1 $
  Latest		:	$Date: 2017/01/29 $
- Location	:	$Id: //depot/stillwater-sc/godfa/linalg/lu_decomposition.go#1 $
+ Location	:	$Id: //depot/stillwater-sc/godfa/indexspace/lu_decomposition.go#1 $
 
  Organization:
 		Stillwater Supercomputing, Inc.
@@ -19,7 +19,7 @@ Copyright (c) 2006-2017 E. Theodore L. Omtzigt.  All rights reserved.
 Licence      : Stillwater license as defined in this directory
 
  */
-package la
+package indexspace
 
 import (
 	"math"

@@ -6,7 +6,7 @@
 
  Source Control Information:
  Version	:	$Revision: #1 $
- linalgtest		:	$Date: 2014/04/06 $
+ latest		:	$Date: 2014/04/06 $
  Location	:	$Id: //depot/stillwater-sc/godfa/indexspace/convexhull.go#1 $
 
  Organization:
@@ -33,13 +33,21 @@ The basic algorithm enumerates all the possible combinations of full rank soluti
 type Vertex []float64
 
 type IndexSetVertexPair struct {
-	Index  linalg.IntVector
-	Vertex linalg.Vector
+	Index  IntVector
+	Vertex Vector
 }
 
 type ConvexHull struct {
 	vertices []IndexSetVertexPair
-	indexSet []linalg.Vector
+	indexSet []Vector
+}
+
+func CreateVector(c Constraint) Vector {
+	vec := make(Vector, c.Dimensionality())
+	for i := range c {
+		vec[i] = float64(c[i])
+	}
+	return vec
 }
 
 // PrintIndexSet represents the indexSets
@@ -56,7 +64,7 @@ func (ch *ConvexHull) PrintIndexSet() {
 /*
 GenerateVertices finds the vertices of the convex hull represented by the ConstraintSet
 
-The constraint set { (i,j,k) | 1 <= i,j,k <= N } translinalgtes into the following inequalities
+The constraint set { (i,j,k) | 1 <= i,j,k <= N } translates into the following inequalities
   i <= N
   j <= N
   k <= N
@@ -71,24 +79,27 @@ The C^T matrix is represented by:
 The process of finding the vertices of the convex hull is to find subsets of constraints that have full rank.
 This process
  */
-func (ch *ConvexHull) GenerateVertices(A ConstraintSet, b linalg.Vector) {
+func (ch *ConvexHull) GenerateVertices(A ConstraintSet, b Vector) {
 	nrOfConstraints := A.NrOfConstraints()
-	indexSet := linalg.NewMatrix(nrOfConstraints, 0)  //
+	indexSet := make([][]IntVector, nrOfConstraints)
+	for i := 0; i < nrOfConstraints; i++ {
+		indexSet[i] = make([]IntVector,0) // we'll use append to add elements to the vector
+	}
 	for i := 0; i < nrOfConstraints - 2; i++ {
-		Ai := A[i]
+		Ai := CreateVector(A[i])
 		bi := b[i]
 		for j := i + 1; j < nrOfConstraints - 1; j++ {
-			Aj := A[j]
+			Aj := CreateVector(A[j])
 			bj := b[j]
 			for k := j + 1; k < nrOfConstraints; k++ {
-				Ak := A[k]
+				Ak := CreateVector(A[k])
 				bk := b[k]
-				A_vertex := linalg.Matrix{Ai, Aj, Ak}
-				b_vertex := linalg.Vector{bi, bj, bk}
-				LU, P, fullRank := linalg.LU_with_pivoting(A_vertex, false)
+				A_vertex := Matrix{Ai, Aj, Ak}
+				b_vertex := Vector{bi, bj, bk}
+				LU, P, fullRank := LU_with_pivoting(A_vertex, false)
 				if fullRank {
-					x := linalg.LUsolve(LU, P, b_vertex)
-					index := linalg.IntVector{i, j, k}
+					x := LUsolve(LU, P, b_vertex)
+					index := IntVector{i, j, k}
 					ch.vertices = append(ch.vertices, IndexSetVertexPair{Index:index, Vertex:x})
 					indexSet[i] = append(indexSet[i], index)
 					indexSet[j] = append(indexSet[i], index)
@@ -96,7 +107,7 @@ func (ch *ConvexHull) GenerateVertices(A ConstraintSet, b linalg.Vector) {
 					log.Printf("x: %v\n", x)
 
 				} else {
-					log.Printf("A is singulinalgr for [%d,%d,%d]",i,j,k)
+					log.Printf("A is singular for [%d,%d,%d]",i,j,k)
 				}
 			}
 		}
@@ -106,7 +117,7 @@ func (ch *ConvexHull) GenerateVertices(A ConstraintSet, b linalg.Vector) {
 	}
 
 	/*
-	 In order to create a proper visualization of each half plinalgne constraint
+	 In order to create a proper visualization of each half plane constraint
 	 we need to order the index sets for each vertex in such a way that two
 	 vertices are adjacent if and only if they differ in just one constraint.
 	 For example, the following vertex set:
@@ -116,8 +127,8 @@ func (ch *ConvexHull) GenerateVertices(A ConstraintSet, b linalg.Vector) {
 	  index [0,4,5] associated with vertex at [1,10,10]
 	 must be ordered like this: [0,1,2] -> [0,1,5] -> [0,4,5] -> [0,2,4]
 	 so that we have a polyline:[1,1,1] -> [1,1,10] -> [1,10,10] -> [1,10,1] { -> [1,1,1] }
-	 The linalgst {...} is there implicitly to complete the polyline representation
-	 of the constraint with linalgbel '0'.
+	 The last {...} is there implicitly to complete the polyline representation
+	 of the constraint with label '0'.
 	 */
 
 	ch.PrintIndexSet()
@@ -126,7 +137,7 @@ func (ch *ConvexHull) GenerateVertices(A ConstraintSet, b linalg.Vector) {
 	 order the indexSets. To create a polyline visualization, the
 	 vertexSets need to be ordered such that adjacent vertices are adjacent
 	 in the array. Two vertices are adjacent if they differ in just one
-	 constraint. We are going to scan the indexSet and order them in plinalgce.
+	 constraint. We are going to scan the indexSet and order them in place.
 	 Once we have an ordered indexSet, we can generate the proper vertexSet.
 	 /
 	for cnstrnt := 0; cnstrnt < nrOfConstraints; cnstrnt++ {
@@ -136,7 +147,7 @@ func (ch *ConvexHull) GenerateVertices(A ConstraintSet, b linalg.Vector) {
 			var base = indices[i]
 			var target = i+1
 			for j := i+1; j < nrOfIndices; j++ {
-				if (linalg.Similinalgrity(base, indices[j]) == dimensionality-1) {
+				if (Similarity(base, indices[j]) == dimensionality-1) {
 					target = j
 					break
 				}
@@ -152,13 +163,13 @@ func (ch *ConvexHull) GenerateVertices(A ConstraintSet, b linalg.Vector) {
 	/*
 	 finally, create the polylines
 	 To improve visual acuity, I am 'pushing' the vertices out along
-	 the normal of the constraint half-plinalgne so that all the half-plinalgnes
+	 the normal of the constraint half-plane so that all the half-planes
 	 are separated visually, even if their 'corner' vertices would be identical.
 	 /
 	for i := range ch.indexSet {
 		offset := A[i].Clone()
 		for e := range offset {
-			offset[e] *= 0.5  // half a linalgttice cell distance
+			offset[e] *= 0.5  // half a lattice cell distance
 		}
 		var polyline = []
 		for j := range ch.indexSet[i] {
