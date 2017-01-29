@@ -69,6 +69,15 @@ func NewConstraint(size int) Constraint {
 	return make(Constraint, size)
 }
 
+// Clone a constraint
+func (c Constraint) Clone() Constraint {
+	newC := NewConstraint(c.Dimensionality())
+	for i := range c {
+		newC[i] = c[i]
+	}
+	return newC
+}
+
 // NewConstraintSet creates an empty ConstraintSet slice
 func NewConstraintSet() ConstraintSet {
 	return make(ConstraintSet, 0)        // since we are using append to add to the slice
@@ -79,7 +88,7 @@ func (cSet ConstraintSet) AddConstraint(constraint Constraint) (ConstraintSet, e
 	if len(cSet) != 0 && len(constraint) != len(cSet[0]) {
 		return cSet, errors.New("Dimensionality of the new constraint is not consistent with the set")
 	}
-	cSet = append(cSet, constraint)
+	cSet = append(cSet, constraint.Clone())
 	return cSet, nil
 }
 

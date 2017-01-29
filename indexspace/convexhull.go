@@ -39,15 +39,22 @@ type IndexSetVertexPair struct {
 
 type ConvexHull struct {
 	vertices []IndexSetVertexPair
-	indexSet []Vector
+	indexSet [][]IntVector
 }
 
-func CreateVector(c Constraint) Vector {
+/*
+TransformConstraintIntoVector transforms a Constraint into a Vector
+ */
+func TransformConstraintIntoVector(c Constraint) Vector {
 	vec := make(Vector, c.Dimensionality())
 	for i := range c {
 		vec[i] = float64(c[i])
 	}
 	return vec
+}
+
+func NewConvexHull() *ConvexHull {
+	return &ConvexHull{}
 }
 
 // PrintIndexSet represents the indexSets
@@ -62,6 +69,42 @@ func (ch *ConvexHull) PrintIndexSet() {
 }
 
 /*
+ Similarity calculates the similarity between two index vectors
+
+ This function returns the number of indices that are shared among the two input vectors.
+   @param i1: vector containing a set of indices
+   @param i2: second vector to compare to
+ @return: number of element matches between the two vectors
+ Example: i1 = [ 0, 1, 2], i2 = [ 1, 2, 3], similarity will return 2
+ for the sum of the matches of the elements, [1, 2].
+ Otherwise stated, similarity calculates the cardinality of the intersection of the two input sets.
+
+ I am using the O(n^2) brute force method of enumerating both sets.
+ We can get away with that as the index sets are relatively small, typically
+ less than 3 element triples and sets less than 5 or 6 elements.
+  */
+func (ch *ConvexHull) similarity(i1, i2 IntVector) int {
+	// count the number of similarities
+	var similarity int = 0
+	if i1.Dimensionality() == i2.Dimensionality() {
+		for i := range i1 {
+			for j := range i2 {
+				if i1[i] == i2[j] {
+					similarity++
+					break;
+				}
+			}
+		}
+	}
+	return similarity
+}
+
+func (ch *ConvexHull) swap(indexSet []IntVector, i1, i2 int) {
+	tmp := indexSet[i1]
+	indexSet[i1] = indexSet[i2]
+	indexSet[i2] = tmp
+}
+/*
 GenerateVertices finds the vertices of the convex hull represented by the ConstraintSet
 
 The constraint set { (i,j,k) | 1 <= i,j,k <= N } translates into the following inequalities
@@ -72,27 +115,27 @@ The constraint set { (i,j,k) | 1 <= i,j,k <= N } translates into the following i
   -j <= -1
   -k <= -1
 The C^T matrix is represented by:
- (i,j,k)[  1  0  0 -1  0  0 ]    [  N ]
-        [  0  1  0  0 -1  0 ] <= [  N ]
-        [  0  0  1  0  0 -1 ]    [  N ]
+ (i,j,k)[  1  0  0 -1  0  0 ]    [  N  N  N -1 -1 -1 ]
+        [  0  1  0  0 -1  0 ] <=
+        [  0  0  1  0  0 -1 ]
 
 The process of finding the vertices of the convex hull is to find subsets of constraints that have full rank.
 This process
  */
 func (ch *ConvexHull) GenerateVertices(A ConstraintSet, b Vector) {
 	nrOfConstraints := A.NrOfConstraints()
-	indexSet := make([][]IntVector, nrOfConstraints)
+	ch.indexSet = make([][]IntVector, nrOfConstraints)
 	for i := 0; i < nrOfConstraints; i++ {
-		indexSet[i] = make([]IntVector,0) // we'll use append to add elements to the vector
+		ch.indexSet[i] = make([]IntVector,0) // we'll use append to add elements to the vector
 	}
 	for i := 0; i < nrOfConstraints - 2; i++ {
-		Ai := CreateVector(A[i])
+		Ai := TransformConstraintIntoVector(A[i])
 		bi := b[i]
 		for j := i + 1; j < nrOfConstraints - 1; j++ {
-			Aj := CreateVector(A[j])
+			Aj := TransformConstraintIntoVector(A[j])
 			bj := b[j]
 			for k := j + 1; k < nrOfConstraints; k++ {
-				Ak := CreateVector(A[k])
+				Ak := TransformConstraintIntoVector(A[k])
 				bk := b[k]
 				A_vertex := Matrix{Ai, Aj, Ak}
 				b_vertex := Vector{bi, bj, bk}
@@ -101,10 +144,10 @@ func (ch *ConvexHull) GenerateVertices(A ConstraintSet, b Vector) {
 					x := LUsolve(LU, P, b_vertex)
 					index := IntVector{i, j, k}
 					ch.vertices = append(ch.vertices, IndexSetVertexPair{Index:index, Vertex:x})
-					indexSet[i] = append(indexSet[i], index)
-					indexSet[j] = append(indexSet[i], index)
-					indexSet[k] = append(indexSet[i], index)
-					log.Printf("x: %v\n", x)
+					ch.indexSet[i] = append(ch.indexSet[i], index)
+					ch.indexSet[j] = append(ch.indexSet[j], index)
+					ch.indexSet[k] = append(ch.indexSet[k], index)
+					log.Printf("x: %v", x)
 
 				} else {
 					log.Printf("A is singular for [%d,%d,%d]",i,j,k)
@@ -136,29 +179,31 @@ func (ch *ConvexHull) GenerateVertices(A ConstraintSet, b Vector) {
 	/*
 	 order the indexSets. To create a polyline visualization, the
 	 vertexSets need to be ordered such that adjacent vertices are adjacent
-	 in the array. Two vertices are adjacent if they differ in just one
+	 in the polyline array. Two vertices are adjacent if they differ in just one
 	 constraint. We are going to scan the indexSet and order them in place.
 	 Once we have an ordered indexSet, we can generate the proper vertexSet.
-	 /
+	 */
 	for cnstrnt := 0; cnstrnt < nrOfConstraints; cnstrnt++ {
-		index := ch.indexSet[cnstrnt]
-		nrOfIndices := index.Dimensionality()
+		indexSet := ch.indexSet[cnstrnt]
+		nrOfIndices := indexSet[0].Dimensionality()
 		for i := 0; i < nrOfIndices-1; i++ {
-			var base = indices[i]
+			var base = indexSet[i]
 			var target = i+1
 			for j := i+1; j < nrOfIndices; j++ {
-				if (Similarity(base, indices[j]) == dimensionality-1) {
+				log.Printf("base: %s  cmp: %s", base, indexSet[j])
+				if ch.similarity(base, indexSet[j]) == nrOfIndices-1 {
 					target = j
+					log.Printf("Similar to within one: %d", nrOfIndices)
 					break
 				}
 			}
 			if target != i+1 {
-				ch.swap(indices,i+1,target)
+				ch.swap(indexSet, i+1,target)
 			}
 		}
 	}
 	ch.PrintIndexSet()
-	*/
+
 
 	/*
 	 finally, create the polylines

@@ -26,6 +26,11 @@ import "fmt"
 // IntVector represents an integer vector
 type IntVector []int
 
+// Dimensionality returns the length of the vector
+func (v IntVector) Dimensionality() int {
+	return len(v)
+}
+
 // Vector represents a vector
 type Vector []float64
 
@@ -39,6 +44,7 @@ func (v Vector) Clone() Vector {
 	return newVector
 }
 
+// Dimensionality returns the length of the vector
 func (v Vector) Dimensionality() int {
 	return len(v)
 }
