@@ -233,7 +233,7 @@ func (ch *ConvexHull) GenerateVertices(A ConstraintSet, b Vector) {
 		for e := range offset {
 			offset[e] = 0.5 * offset[e]  // half a lattice cell distance
 		}
-		
+
 		for _, vertexSet := range ch.polygonIndexSet[halfplaneIndex] {
 			// find the index where the vertex is stored
 			for k := range ch.indexSet {
