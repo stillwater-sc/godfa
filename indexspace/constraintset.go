@@ -78,6 +78,16 @@ func (c Constraint) Clone() Constraint {
 	return newC
 }
 
+// CreateVector creates a Vector from an Constraint
+func (c Constraint) CreateVector() Vector {
+	n := len(c)
+	newVector := make(Vector, n)
+	for i := 0; i < n; i++ {
+		newVector[i] = float64(c[i])
+	}
+	return newVector
+}
+
 // NewConstraintSet creates an empty ConstraintSet slice
 func NewConstraintSet() ConstraintSet {
 	return make(ConstraintSet, 0)        // since we are using append to add to the slice

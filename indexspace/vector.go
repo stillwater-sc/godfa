@@ -59,6 +59,16 @@ func NewVector(size int) Vector {
 	return make(Vector, size)
 }
 
+// CreateVector creates a Vector from an IntVector
+func (v IntVector) CreateVector() Vector {
+	n := len(v)
+	newVector := make(Vector, n)
+	for i := 0; i < n; i++ {
+		newVector[i] = float64(v[i])
+	}
+	return newVector
+}
+
 // Stringer for a IntVector
 func (v IntVector) String() string {
 	var str string
