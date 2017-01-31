@@ -22,6 +22,6 @@ Licence      : Stillwater license as defined in this directory
 package indexspace
 
 type DomainOfComputation struct {
-	A ConstraintSet
-	b Constraint
+	A Matrix
+	b Vector
 }
