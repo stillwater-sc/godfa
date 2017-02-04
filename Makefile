@@ -1,7 +1,7 @@
 
 
-api-server:
-	go install github.com/stillwater-sc/godfa/cmd/dfa-api-server
+dfa-server:
+	go install github.com/stillwater-sc/godfa/api/cmd/dfa-server
 
 
 indexspace:
