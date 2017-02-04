@@ -1,0 +1,126 @@
+---
+# this is the specification of the Stillwater go-dfa API server
+swagger: '2.0'
+host: localhost
+info:
+  title: Stillwater Domain Flow Service API
+  description: |
+    Provides geometry, combinatorics, integer programming, functional simulation,
+    and other domain flow algorithm analysis services
+  version: 0.1.0
+  contact:
+    name: Stillwater Supercomputing, Inc. Domain Flow API team
+    email: dfa-services@stillwater-sc.com
+    url: http://www.stillwater-sc.com/about.html
+  license:
+    name: creative commons
+schemes:
+  - http
+basePath: /api/dfa
+consumes:
+  - application/dfa.api.v1+json
+produces:
+  - application/dfa.api.v1+json
+
+securityDefinitions:
+  securityHeader:
+    type: apiKey
+    in: header
+    name: X-Token
+  securityQuery:
+    type: apiKey
+    in: query
+    name: token
+security:
+  - securityHeader: []
+  - securityQuery: []
+
+paths:
+  /:
+    get:
+      tags: ["root"]
+      operationId: version
+      summary: API version
+      description: |
+        Return the version of the DFA API
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: "#/definitions/version"
+        default:
+          description: error
+          schema:
+            $ref: "#/definitions/error"
+  /convexhull:
+    post:
+      tags: ["geometry"]
+      operationId: getConvexHull
+      summary: Calculate the Convex Hull of a Domain
+      description: |
+         Given a domain defined by a constraint set, calculate the vertices and faces of the Convex Hull
+      parameters:
+        - name: domain
+          in: body
+          schema:
+            $ref: "#/definitions/constraintSet"
+      responses:
+        '200':
+          description: return the convex hull of a constraint set
+          schema:
+            $ref: "#/definitions/convexhull"
+        default:
+          description: error
+          schema:
+            $ref: "#/definitions/error"
+
+definitions:
+  principal:
+    type: string
+  version:
+    type: string
+  value:
+    type: number
+    format: float32
+  constraint:
+    type: object
+    properties:
+      dimension:
+         type: integer
+         enum:
+          - 1
+          - 2
+          - 3
+      vector:
+        type: array
+        items:
+          $ref: "#/definitions/value"
+      rhs:
+        type: number
+        format: float32
+  constraintSet:
+    type: object
+    properties:
+      constraints:
+        type: array
+        items:
+          $ref: "#/definitions/constraint"
+  convexhull:
+    type: object
+    properties:
+      vertices:
+        type: array
+        items:
+          $ref: "#/definitions/value"
+  error:
+    type: object
+    required:
+      - message
+    properties:
+      code:
+        type: integer
+        format: int64
+      message:
+        type: string
+      fields:
+        type: string
