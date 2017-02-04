@@ -35,8 +35,8 @@ func init() {
 	}
 }
 
-// NewServer creates a new api stillwater domain flow service server but does not configure it
-func NewServer(api *operations.StillwaterDomainFlowServiceAPI) *Server {
+// NewServer creates a new api dfa server but does not configure it
+func NewServer(api *operations.DfaAPI) *Server {
 	s := new(Server)
 
 	s.api = api
@@ -57,13 +57,13 @@ func (s *Server) ConfigureFlags() {
 	}
 }
 
-// Server for the stillwater domain flow service API
+// Server for the dfa API
 type Server struct {
 	EnabledListeners []string         `long:"scheme" description:"the listeners to enable, this can be repeated and defaults to the schemes in the swagger spec"`
 	CleanupTimeout   time.Duration    `long:"cleanup-timeout" description:"grace period for which to wait before shutting down the server" default:"10s"`
 	MaxHeaderSize    flagext.ByteSize `long:"max-header-size" description:"controls the maximum number of bytes the server will read parsing the request header's keys and values, including the request line. It does not limit the size of the request body." default:"1MiB"`
 
-	SocketPath    flags.Filename `long:"socket-path" description:"the unix socket to listen on" default:"/var/run/stillwater-domain-flow-service.sock"`
+	SocketPath    flags.Filename `long:"socket-path" description:"the unix socket to listen on" default:"/var/run/dfa.sock"`
 	domainSocketL net.Listener
 
 	Host         string        `long:"host" description:"the IP to listen on" default:"localhost" env:"HOST"`
@@ -85,7 +85,7 @@ type Server struct {
 	TLSWriteTimeout   time.Duration  `long:"tls-write-timeout" description:"maximum duration before timing out write of the response"`
 	httpsServerL      net.Listener
 
-	api          *operations.StillwaterDomainFlowServiceAPI
+	api          *operations.DfaAPI
 	handler      http.Handler
 	hasListeners bool
 }
@@ -111,7 +111,7 @@ func (s *Server) Fatalf(f string, args ...interface{}) {
 }
 
 // SetAPI configures the server with the specified API. Needs to be called before Serve
-func (s *Server) SetAPI(api *operations.StillwaterDomainFlowServiceAPI) {
+func (s *Server) SetAPI(api *operations.DfaAPI) {
 	if api == nil {
 		s.api = nil
 		s.handler = nil
@@ -168,13 +168,13 @@ func (s *Server) Serve() (err error) {
 		configureServer(domainSocket, "unix")
 
 		wg.Add(1)
-		s.Logf("Serving stillwater domain flow service at unix://%s", s.SocketPath)
+		s.Logf("Serving dfa at unix://%s", s.SocketPath)
 		go func(l net.Listener) {
 			defer wg.Done()
 			if err := domainSocket.Serve(l); err != nil {
 				s.Fatalf("%v", err)
 			}
-			s.Logf("Stopped serving stillwater domain flow service at unix://%s", s.SocketPath)
+			s.Logf("Stopped serving dfa at unix://%s", s.SocketPath)
 		}(s.domainSocketL)
 	}
 
@@ -197,13 +197,13 @@ func (s *Server) Serve() (err error) {
 		configureServer(httpServer, "http")
 
 		wg.Add(1)
-		s.Logf("Serving stillwater domain flow service at http://%s", s.httpServerL.Addr())
+		s.Logf("Serving dfa at http://%s", s.httpServerL.Addr())
 		go func(l net.Listener) {
 			defer wg.Done()
 			if err := httpServer.Serve(l); err != nil {
 				s.Fatalf("%v", err)
 			}
-			s.Logf("Stopped serving stillwater domain flow service at http://%s", l.Addr())
+			s.Logf("Stopped serving dfa at http://%s", l.Addr())
 		}(s.httpServerL)
 	}
 
@@ -282,13 +282,13 @@ func (s *Server) Serve() (err error) {
 		configureServer(httpsServer, "https")
 
 		wg.Add(1)
-		s.Logf("Serving stillwater domain flow service at https://%s", s.httpsServerL.Addr())
+		s.Logf("Serving dfa at https://%s", s.httpsServerL.Addr())
 		go func(l net.Listener) {
 			defer wg.Done()
 			if err := httpsServer.Serve(l); err != nil {
 				s.Fatalf("%v", err)
 			}
-			s.Logf("Stopped serving stillwater domain flow service at https://%s", l.Addr())
+			s.Logf("Stopped serving dfa at https://%s", l.Addr())
 		}(tls.NewListener(s.httpsServerL, httpsServer.TLSConfig))
 	}
 

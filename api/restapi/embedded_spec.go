@@ -22,7 +22,7 @@ func init() {
   "swagger": "2.0",
   "info": {
     "description": "Provides geometry, combinatorics, integer programming, functional simulation,\nand other domain flow algorithm analysis services\n",
-    "title": "Stillwater Domain Flow Service API",
+    "title": "dfa api",
     "contact": {
       "name": "Stillwater Supercomputing, Inc. Domain Flow API team",
       "url": "http://www.stillwater-sc.com/about.html",

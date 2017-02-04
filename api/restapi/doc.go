@@ -1,4 +1,4 @@
-/*Package restapi Stillwater Domain Flow Service API
+/*Package restapi dfa api
 
 Provides geometry, combinatorics, integer programming, functional simulation,
 and other domain flow algorithm analysis services

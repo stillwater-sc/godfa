@@ -21,12 +21,12 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	api := operations.NewStillwaterDomainFlowServiceAPI(swaggerSpec)
+	api := operations.NewDfaAPI(swaggerSpec)
 	server := restapi.NewServer(api)
 	defer server.Shutdown()
 
 	parser := flags.NewParser(server, flags.Default)
-	parser.ShortDescription = "Stillwater Domain Flow Service API"
+	parser.ShortDescription = "dfa api"
 	parser.LongDescription = "Provides geometry, combinatorics, integer programming, functional simulation,\nand other domain flow algorithm analysis services\n"
 
 	server.ConfigureFlags()

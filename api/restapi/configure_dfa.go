@@ -19,11 +19,11 @@ import (
 
 //go:generate swagger generate server --target .. --name  --spec ..\dfa-api.yaml --principal models.Principal
 
-func configureFlags(api *operations.StillwaterDomainFlowServiceAPI) {
+func configureFlags(api *operations.DfaAPI) {
 	// api.CommandLineOptionsGroups = []swag.CommandLineOptionsGroup{ ... }
 }
 
-func configureAPI(api *operations.StillwaterDomainFlowServiceAPI) http.Handler {
+func configureAPI(api *operations.DfaAPI) http.Handler {
 	// configure the api here
 	api.ServeError = errors.ServeError
 

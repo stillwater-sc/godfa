@@ -22,9 +22,9 @@ import (
 	"github.com/stillwater-sc/godfa/api/restapi/operations/root"
 )
 
-// NewStillwaterDomainFlowServiceAPI creates a new StillwaterDomainFlowService instance
-func NewStillwaterDomainFlowServiceAPI(spec *loads.Document) *StillwaterDomainFlowServiceAPI {
-	return &StillwaterDomainFlowServiceAPI{
+// NewDfaAPI creates a new Dfa instance
+func NewDfaAPI(spec *loads.Document) *DfaAPI {
+	return &DfaAPI{
 		handlers:        make(map[string]map[string]http.Handler),
 		formats:         strfmt.Default,
 		defaultConsumes: "application/json",
@@ -52,10 +52,10 @@ func NewStillwaterDomainFlowServiceAPI(spec *loads.Document) *StillwaterDomainFl
 	}
 }
 
-/*StillwaterDomainFlowServiceAPI Provides geometry, combinatorics, integer programming, functional simulation,
+/*DfaAPI Provides geometry, combinatorics, integer programming, functional simulation,
 and other domain flow algorithm analysis services
 */
-type StillwaterDomainFlowServiceAPI struct {
+type DfaAPI struct {
 	spec            *loads.Document
 	context         *middleware.Context
 	handlers        map[string]map[string]http.Handler
@@ -98,42 +98,42 @@ type StillwaterDomainFlowServiceAPI struct {
 }
 
 // SetDefaultProduces sets the default produces media type
-func (o *StillwaterDomainFlowServiceAPI) SetDefaultProduces(mediaType string) {
+func (o *DfaAPI) SetDefaultProduces(mediaType string) {
 	o.defaultProduces = mediaType
 }
 
 // SetDefaultConsumes returns the default consumes media type
-func (o *StillwaterDomainFlowServiceAPI) SetDefaultConsumes(mediaType string) {
+func (o *DfaAPI) SetDefaultConsumes(mediaType string) {
 	o.defaultConsumes = mediaType
 }
 
 // SetSpec sets a spec that will be served for the clients.
-func (o *StillwaterDomainFlowServiceAPI) SetSpec(spec *loads.Document) {
+func (o *DfaAPI) SetSpec(spec *loads.Document) {
 	o.spec = spec
 }
 
 // DefaultProduces returns the default produces media type
-func (o *StillwaterDomainFlowServiceAPI) DefaultProduces() string {
+func (o *DfaAPI) DefaultProduces() string {
 	return o.defaultProduces
 }
 
 // DefaultConsumes returns the default consumes media type
-func (o *StillwaterDomainFlowServiceAPI) DefaultConsumes() string {
+func (o *DfaAPI) DefaultConsumes() string {
 	return o.defaultConsumes
 }
 
 // Formats returns the registered string formats
-func (o *StillwaterDomainFlowServiceAPI) Formats() strfmt.Registry {
+func (o *DfaAPI) Formats() strfmt.Registry {
 	return o.formats
 }
 
 // RegisterFormat registers a custom format validator
-func (o *StillwaterDomainFlowServiceAPI) RegisterFormat(name string, format strfmt.Format, validator strfmt.Validator) {
+func (o *DfaAPI) RegisterFormat(name string, format strfmt.Format, validator strfmt.Validator) {
 	o.formats.Add(name, format, validator)
 }
 
-// Validate validates the registrations in the StillwaterDomainFlowServiceAPI
-func (o *StillwaterDomainFlowServiceAPI) Validate() error {
+// Validate validates the registrations in the DfaAPI
+func (o *DfaAPI) Validate() error {
 	var unregistered []string
 
 	if o.JSONConsumer == nil {
@@ -168,12 +168,12 @@ func (o *StillwaterDomainFlowServiceAPI) Validate() error {
 }
 
 // ServeErrorFor gets a error handler for a given operation id
-func (o *StillwaterDomainFlowServiceAPI) ServeErrorFor(operationID string) func(http.ResponseWriter, *http.Request, error) {
+func (o *DfaAPI) ServeErrorFor(operationID string) func(http.ResponseWriter, *http.Request, error) {
 	return o.ServeError
 }
 
 // AuthenticatorsFor gets the authenticators for the specified security schemes
-func (o *StillwaterDomainFlowServiceAPI) AuthenticatorsFor(schemes map[string]spec.SecurityScheme) map[string]runtime.Authenticator {
+func (o *DfaAPI) AuthenticatorsFor(schemes map[string]spec.SecurityScheme) map[string]runtime.Authenticator {
 
 	result := make(map[string]runtime.Authenticator)
 	for name, scheme := range schemes {
@@ -198,7 +198,7 @@ func (o *StillwaterDomainFlowServiceAPI) AuthenticatorsFor(schemes map[string]sp
 }
 
 // ConsumersFor gets the consumers for the specified media types
-func (o *StillwaterDomainFlowServiceAPI) ConsumersFor(mediaTypes []string) map[string]runtime.Consumer {
+func (o *DfaAPI) ConsumersFor(mediaTypes []string) map[string]runtime.Consumer {
 
 	result := make(map[string]runtime.Consumer)
 	for _, mt := range mediaTypes {
@@ -214,7 +214,7 @@ func (o *StillwaterDomainFlowServiceAPI) ConsumersFor(mediaTypes []string) map[s
 }
 
 // ProducersFor gets the producers for the specified media types
-func (o *StillwaterDomainFlowServiceAPI) ProducersFor(mediaTypes []string) map[string]runtime.Producer {
+func (o *DfaAPI) ProducersFor(mediaTypes []string) map[string]runtime.Producer {
 
 	result := make(map[string]runtime.Producer)
 	for _, mt := range mediaTypes {
@@ -230,7 +230,7 @@ func (o *StillwaterDomainFlowServiceAPI) ProducersFor(mediaTypes []string) map[s
 }
 
 // HandlerFor gets a http.Handler for the provided operation method and path
-func (o *StillwaterDomainFlowServiceAPI) HandlerFor(method, path string) (http.Handler, bool) {
+func (o *DfaAPI) HandlerFor(method, path string) (http.Handler, bool) {
 	if o.handlers == nil {
 		return nil, false
 	}
@@ -242,8 +242,8 @@ func (o *StillwaterDomainFlowServiceAPI) HandlerFor(method, path string) (http.H
 	return h, ok
 }
 
-// Context returns the middleware context for the stillwater domain flow service API
-func (o *StillwaterDomainFlowServiceAPI) Context() *middleware.Context {
+// Context returns the middleware context for the dfa API
+func (o *DfaAPI) Context() *middleware.Context {
 	if o.context == nil {
 		o.context = middleware.NewRoutableContext(o.spec, o, nil)
 	}
@@ -251,7 +251,7 @@ func (o *StillwaterDomainFlowServiceAPI) Context() *middleware.Context {
 	return o.context
 }
 
-func (o *StillwaterDomainFlowServiceAPI) initHandlerCache() {
+func (o *DfaAPI) initHandlerCache() {
 	o.Context() // don't care about the result, just that the initialization happened
 
 	if o.handlers == nil {
@@ -272,7 +272,7 @@ func (o *StillwaterDomainFlowServiceAPI) initHandlerCache() {
 
 // Serve creates a http handler to serve the API over HTTP
 // can be used directly in http.ListenAndServe(":8000", api.Serve(nil))
-func (o *StillwaterDomainFlowServiceAPI) Serve(builder middleware.Builder) http.Handler {
+func (o *DfaAPI) Serve(builder middleware.Builder) http.Handler {
 	o.Init()
 
 	if o.Middleware != nil {
@@ -282,7 +282,7 @@ func (o *StillwaterDomainFlowServiceAPI) Serve(builder middleware.Builder) http.
 }
 
 // Init allows you to just initialize the handler cache, you can then recompose the middelware as you see fit
-func (o *StillwaterDomainFlowServiceAPI) Init() {
+func (o *DfaAPI) Init() {
 	if len(o.handlers) == 0 {
 		o.initHandlerCache()
 	}

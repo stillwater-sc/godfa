@@ -3,7 +3,7 @@
 swagger: '2.0'
 host: localhost
 info:
-  title: Stillwater Domain Flow Service API
+  title: dfa api
   description: |
     Provides geometry, combinatorics, integer programming, functional simulation,
     and other domain flow algorithm analysis services
